@@ -19,6 +19,10 @@ const FS_DB = COLE_LOCAL ? "./db.db" : "/secrets/db.db";
 const FS_SESSION_SECRT = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/secret-generation/session-secret.secret" : "/secrets/session-secret.secret";
 const FS_REFCODE_ASSOCIATIONS = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/secret-generation/ref-codes.secret" : "/secrets/ref-codes.secret";
 const FS_INIT_SQL = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/init.sql" : "/secrets/init.sql";
+const FS_ITEM_MUFFIN = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/muffin.png" : "/secrets/muffin.png" // so secretive!
+const FS_ITEM_DONUT = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/donut.png" : "/secrets/donut.png" // so secretive!
+const FS_ITEM_PIE = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/pie.png" : "/secrets/pie.png" // so secretive!
+
 
 const SESSION_SECRET = readFileSync(FS_SESSION_SECRT).toString()
 const REFCODE_ASSOCIATIONS = Object.fromEntries(readFileSync(FS_REFCODE_ASSOCIATIONS)
@@ -28,23 +32,23 @@ const REFCODE_ASSOCIATIONS = Object.fromEntries(readFileSync(FS_REFCODE_ASSOCIAT
     }))
 const INIT_SQL = readFileSync(FS_INIT_SQL).toString();
 
-const CREATE_ORDER_SQL = "INSERT INTO BadgerBakeryOrder(username, numBagel, numDonut, numPie) VALUES(?, ?, ?, ?) RETURNING id, placedOn;";
+const CREATE_ORDER_SQL = "INSERT INTO BadgerBakeryOrder(username, numMuffin, numDonut, numPie) VALUES(?, ?, ?, ?) RETURNING id, placedOn;";
 const GET_ORDERS_SQL = "SELECT * From BadgerBakeryOrder ORDER BY id DESC LIMIT 25;"
 
 const BAKERY_ITEMS = {
-    bagel: {
+    muffin: {
         price: 1.50,
-        fontAwesome: "fa-solid fa-bagel",
+        img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/muffin",
         upperBound: 144
     },
     donut: {
         price: 1.00,
-        fontAwesome: "fa-solid fa-donut",
+        img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/donut",
         upperBound: 64
     },
     pie: {
         price: 6.75,
-        fontAwesome: "fa-duotone fa-pie",
+        img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/pie",
         upperBound: 16
     }
 };
@@ -111,6 +115,27 @@ app.get('/api/bakery/items', (req: any, res) => {
     res.status(200).send(BAKERY_ITEMS);
 });
 
+app.get('/api/bakery/images/muffin', (req: any, res) => {
+    res.set({
+        "Cache-Control": "public, max-age=86400",
+        "Expires": new Date(Date.now() + 86400000).toUTCString()
+    }).status(200).sendFile(FS_ITEM_MUFFIN);
+});
+
+app.get('/api/bakery/images/donut', (req: any, res) => {
+    res.set({
+        "Cache-Control": "public, max-age=86400",
+        "Expires": new Date(Date.now() + 86400000).toUTCString()
+    }).status(200).sendFile(FS_ITEM_DONUT);
+});
+
+app.get('/api/bakery/images/pie', (req: any, res) => {
+    res.set({
+        "Cache-Control": "public, max-age=86400",
+        "Expires": new Date(Date.now() + 86400000).toUTCString()
+    }).status(200).sendFile(FS_ITEM_PIE);
+});
+
 app.get('/api/bakery/order', (req: any, res) => {
     db.prepare(GET_ORDERS_SQL).run().all((err, rows) => {
         if (!err) {
@@ -128,19 +153,19 @@ app.get('/api/bakery/order', (req: any, res) => {
 });
 
 app.post('/api/bakery/order', (req: any, res) => {
-    const strNumBagel = req.body.bagel;
+    const strNumMuffin = req.body.muffin;
     const strNumDonut = req.body.donut;
     const strNumPie = req.body.pie;
     const refCode = req.body.refCode;
     if (refCode && refCode in REFCODE_ASSOCIATIONS) {
         const username = REFCODE_ASSOCIATIONS[refCode].split("@wisc.edu")[0];
-        if (isInt(strNumBagel) && isInt(strNumDonut) && isInt(strNumPie)) {
-            const numBagel = parseInt(strNumBagel);
+        if (isInt(strNumMuffin) && isInt(strNumDonut) && isInt(strNumPie)) {
+            const numMuffin = parseInt(strNumMuffin);
             const numDonut = parseInt(strNumDonut);
             const numPie = parseInt(strNumPie);
 
-            if (numBagel <= 144 && numDonut <= 64 && numPie <= 16 && numBagel >= 0 && numDonut >= 0 && numPie >= 0 && numBagel + numDonut + numPie > 0) {
-                db.prepare(CREATE_ORDER_SQL).get(username, numBagel, numDonut, numPie, (err: any, resp: any) => {
+            if (numMuffin <= 144 && numDonut <= 64 && numPie <= 16 && numMuffin >= 0 && numDonut >= 0 && numPie >= 0 && numMuffin + numDonut + numPie > 0) {
+                db.prepare(CREATE_ORDER_SQL).get(username, numMuffin, numDonut, numPie, (err: any, resp: any) => {
                     if (!err) {
                         res.status(200).send({
                             msg: "Successfully made order!",
@@ -161,7 +186,7 @@ app.post('/api/bakery/order', (req: any, res) => {
             }
         } else {
             res.status(400).send({
-                msg: 'A request must contain integers \'bagel\', \'donut\' and \'pie\''
+                msg: 'A request must contain integers \'muffin\', \'donut\' and \'pie\''
             })
         }
     } else {
