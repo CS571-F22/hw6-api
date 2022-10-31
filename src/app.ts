@@ -173,7 +173,7 @@ app.get('/api/bakery/order', (req: any, res) => {
         if (!err) {
             res.status(200).send({
                 msg: "Successfully got the latest orders!",
-                messages: rows
+                orders: rows
             });
         } else {
             res.status(500).send({
@@ -201,7 +201,7 @@ app.post('/api/bakery/order', (req: any, res) => {
             const numCroissant = parseInt(strNumCroissant);
 
 
-            if (numMuffin <= 144 && numDonut <= 64 && numPie <= 16 && numCupcake <= 32 && numCroissant <= 48 && numMuffin >= 0 && numDonut >= 0 && numPie >= 0 && numCupcake >= 0 && numCroissant >= 0 && numMuffin + numDonut + numPie + numCupcake + numCroissant > 0) {
+            if (numMuffin <= 8 && numDonut <= 8 && numPie <= 2 && numCupcake <= 4 && numCroissant <= 6 && numMuffin >= 0 && numDonut >= 0 && numPie >= 0 && numCupcake >= 0 && numCroissant >= 0 && numMuffin + numDonut + numPie + numCupcake + numCroissant > 0) {
                 db.prepare(CREATE_ORDER_SQL).get(username, numMuffin, numDonut, numPie, numCupcake, numCroissant, (err: any, resp: any) => {
                     if (!err) {
                         res.status(200).send({
