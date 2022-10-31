@@ -43,31 +43,31 @@ const BAKERY_ITEMS = [
         name: "muffin",
         price: 1.50,
         img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/muffin",
-        upperBound: 144
+        upperBound: 8
     },
     {
         name: "donut",
         price: 1.00,
         img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/donut",
-        upperBound: 64
+        upperBound: 8
     },
     {
         name: "pie",
         price: 6.75,
         img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/pie",
-        upperBound: 16
+        upperBound: 2
     },
     {
         name: "cupcake",
         price: 2.00,
         img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/cupcake",
-        upperBound: 32
+        upperBound: 4
     },
     {
         name: "croissant",
         price: 0.75,
         img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/croissant",
-        upperBound: 48
+        upperBound: 6
     }
 ];
 
