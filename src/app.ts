@@ -19,9 +19,12 @@ const FS_DB = COLE_LOCAL ? "./db.db" : "/secrets/db.db";
 const FS_SESSION_SECRT = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/secret-generation/session-secret.secret" : "/secrets/session-secret.secret";
 const FS_REFCODE_ASSOCIATIONS = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/secret-generation/ref-codes.secret" : "/secrets/ref-codes.secret";
 const FS_INIT_SQL = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/init.sql" : "/secrets/init.sql";
+
 const FS_ITEM_MUFFIN = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/muffin.png" : "/secrets/muffin.png" // so secretive!
 const FS_ITEM_DONUT = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/donut.png" : "/secrets/donut.png" // so secretive!
 const FS_ITEM_PIE = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/pie.png" : "/secrets/pie.png" // so secretive!
+const FS_ITEM_CUPCAKE = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/cupcake.png" : "/secrets/cupcake.png" // so secretive!
+const FS_ITEM_CROISSANT = COLE_LOCAL ? "C:/Users/ColeNelson/Desktop/cs571-git/homework/apis/hw6-api/includes/croissant.png" : "/secrets/croissant.png" // so secretive!
 
 
 const SESSION_SECRET = readFileSync(FS_SESSION_SECRT).toString()
@@ -35,23 +38,38 @@ const INIT_SQL = readFileSync(FS_INIT_SQL).toString();
 const CREATE_ORDER_SQL = "INSERT INTO BadgerBakeryOrder(username, numMuffin, numDonut, numPie) VALUES(?, ?, ?, ?) RETURNING id, placedOn;";
 const GET_ORDERS_SQL = "SELECT * From BadgerBakeryOrder ORDER BY id DESC LIMIT 25;"
 
-const BAKERY_ITEMS = {
-    muffin: {
+const BAKERY_ITEMS = [
+    {
+        name: "muffin",
         price: 1.50,
         img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/muffin",
         upperBound: 144
     },
-    donut: {
+    {
+        name: "donut",
         price: 1.00,
         img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/donut",
         upperBound: 64
     },
-    pie: {
+    {
+        name: "pie",
         price: 6.75,
         img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/pie",
         upperBound: 16
+    },
+    {
+        name: "cupcake",
+        price: 2.00,
+        img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/cupcake",
+        upperBound: 32
+    },
+    {
+        name: "croissant",
+        price: 0.75,
+        img: "https://www.coletnelson.us/cs571/f22/hw6/api/bakery/images/croissant",
+        upperBound: 48
     }
-};
+];
 
 // https://stackoverflow.com/questions/14636536/how-to-check-if-a-variable-is-an-integer-in-javascript
 function isInt(value: any) {
@@ -136,6 +154,20 @@ app.get('/api/bakery/images/pie', (req: any, res) => {
     }).status(200).sendFile(FS_ITEM_PIE);
 });
 
+app.get('/api/bakery/images/cupcake', (req: any, res) => {
+    res.set({
+        "Cache-Control": "public, max-age=86400",
+        "Expires": new Date(Date.now() + 86400000).toUTCString()
+    }).status(200).sendFile(FS_ITEM_CUPCAKE);
+});
+
+app.get('/api/bakery/images/croissant', (req: any, res) => {
+    res.set({
+        "Cache-Control": "public, max-age=86400",
+        "Expires": new Date(Date.now() + 86400000).toUTCString()
+    }).status(200).sendFile(FS_ITEM_CROISSANT);
+});
+
 app.get('/api/bakery/order', (req: any, res) => {
     db.prepare(GET_ORDERS_SQL).run().all((err, rows) => {
         if (!err) {
@@ -156,16 +188,21 @@ app.post('/api/bakery/order', (req: any, res) => {
     const strNumMuffin = req.body.muffin;
     const strNumDonut = req.body.donut;
     const strNumPie = req.body.pie;
+    const strNumCupcake = req.body.cupcake;
+    const strNumCroissant = req.body.croissant;
     const refCode = req.body.refCode;
     if (refCode && refCode in REFCODE_ASSOCIATIONS) {
         const username = REFCODE_ASSOCIATIONS[refCode].split("@wisc.edu")[0];
-        if (isInt(strNumMuffin) && isInt(strNumDonut) && isInt(strNumPie)) {
+        if (isInt(strNumMuffin) && isInt(strNumDonut) && isInt(strNumPie) && isInt(strNumCupcake) && isInt(strNumCroissant)) {
             const numMuffin = parseInt(strNumMuffin);
             const numDonut = parseInt(strNumDonut);
             const numPie = parseInt(strNumPie);
+            const numCupcake = parseInt(strNumCupcake);
+            const numCroissant = parseInt(strNumCroissant);
 
-            if (numMuffin <= 144 && numDonut <= 64 && numPie <= 16 && numMuffin >= 0 && numDonut >= 0 && numPie >= 0 && numMuffin + numDonut + numPie > 0) {
-                db.prepare(CREATE_ORDER_SQL).get(username, numMuffin, numDonut, numPie, (err: any, resp: any) => {
+
+            if (numMuffin <= 144 && numDonut <= 64 && numPie <= 16 && numCupcake <= 32 && numCroissant <= 48 && numMuffin >= 0 && numDonut >= 0 && numPie >= 0 && numCupcake >= 0 && numCroissant >= 0 && numMuffin + numDonut + numPie + numCupcake + numCroissant > 0) {
+                db.prepare(CREATE_ORDER_SQL).get(username, numMuffin, numDonut, numPie, numCupcake, numCroissant, (err: any, resp: any) => {
                     if (!err) {
                         res.status(200).send({
                             msg: "Successfully made order!",
@@ -186,7 +223,7 @@ app.post('/api/bakery/order', (req: any, res) => {
             }
         } else {
             res.status(400).send({
-                msg: 'A request must contain integers \'muffin\', \'donut\' and \'pie\''
+                msg: 'A request must contain integers \'muffin\', \'donut\', \'pie\', \'cupcake\', and \'croissant\''
             })
         }
     } else {
