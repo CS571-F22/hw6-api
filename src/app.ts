@@ -35,7 +35,7 @@ const REFCODE_ASSOCIATIONS = Object.fromEntries(readFileSync(FS_REFCODE_ASSOCIAT
     }))
 const INIT_SQL = readFileSync(FS_INIT_SQL).toString();
 
-const CREATE_ORDER_SQL = "INSERT INTO BadgerBakeryOrder(username, numMuffin, numDonut, numPie) VALUES(?, ?, ?, ?) RETURNING id, placedOn;";
+const CREATE_ORDER_SQL = "INSERT INTO BadgerBakeryOrder(username, numMuffin, numDonut, numPie, numCupcake, numCroissant) VALUES(?, ?, ?, ?, ?, ?) RETURNING id, placedOn;";
 const GET_ORDERS_SQL = "SELECT * From BadgerBakeryOrder ORDER BY id DESC LIMIT 25;"
 
 const BAKERY_ITEMS = [
